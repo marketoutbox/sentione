@@ -28,13 +28,14 @@ export default function GoogleTrendSignalsPage() {
   const [sortOrder, setSortOrder] = useState("desc")
   const [comparisonData, setComparisonData] = useState([])
   const [error, setError] = useState<string | null>(null)
-  const [summaryStats, setSummaryStats] = {
+  const [summaryStats, setSummaryStats] = useState({
+    // Corrected: useState
     total: 0,
     positive: 0,
     negative: 0,
     neutral: 0,
     lastUpdate: "",
-  }
+  })
 
   const [currentPrices, setCurrentPrices] = useState<Record<string, number>>({})
   const [pricesLoading, setPricesLoading] = useState(false)
@@ -301,7 +302,7 @@ export default function GoogleTrendSignalsPage() {
                       <th className="px-6 py-4 font-medium">Date</th>
                       <th className="px-6 py-4 font-medium">Symbol</th>
                       <th className="px-6 py-4 font-medium">Analyzed Keywords</th>
-                      <th className="px-6 py-4 font-medium text-right">Sentiment Score</th>
+                      <th className="px-6 py-4 text-right font-medium">Sentiment Score</th>
                       <th className="px-6 py-4 text-center font-medium">Sentiment</th>
                       <th className="px-6 py-4 font-medium text-right">Entry Price</th>
                       <th className="px-6 py-4 font-medium text-right">Current Price</th>
