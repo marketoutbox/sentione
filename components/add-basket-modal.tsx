@@ -1,86 +1,85 @@
 "use client"
 
-import type React from "react"
 import { useState } from "react"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Loader2, Plus } from 'lucide-react'
 
 interface AddBasketModalProps {
-  open: boolean // Added prop for controlled state
-  onOpenChange: (open: boolean) => void // Added prop for controlled state
-  onCreateBasket: (basketName: string) => void // Renamed from onConfirm for clarity
-  children: React.ReactNode
-  title?: string
-  description?: string
-  confirmText?: string
-  cancelText?: string
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onSave: (basketName: string) => void
+  isLoading?: boolean
 }
 
-const AddBasketModal = ({
-  open,
-  onOpenChange,
-  onCreateBasket,
-  children,
-  title = "Create New Basket",
-  description = "Enter a name for your new stock basket.",
-  confirmText = "Create Basket",
-  cancelText = "Cancel",
-}: AddBasketModalProps) => {
-  const [newBasketName, setNewBasketName] = useState("")
+export function AddBasketModal({ open, onOpenChange, onSave, isLoading = false }: AddBasketModalProps) {
+  const [basketName, setBasketName] = useState("")
 
-  const handleConfirm = () => {
-    if (newBasketName.trim()) {
-      onCreateBasket(newBasketName.trim())
-      setNewBasketName("") // Clear input after creation
+  const handleSave = () => {
+    if (basketName.trim()) {
+      onSave(basketName.trim())
+      setBasketName("") // Reset for next time
     }
   }
 
+  const handleCancel = () => {
+    setBasketName("")
+    onOpenChange(false)
+  }
+
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
-      <AlertDialogContent className="w-full max-w-sm sm:max-w-md bg-card border-border">
-        <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
-        </AlertDialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Plus className="h-5 w-5 text-primary" />
+            Add to New Basket
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
             <Label htmlFor="basket-name">Basket Name</Label>
             <Input
               id="basket-name"
-              value={newBasketName}
-              onChange={(e) => setNewBasketName(e.target.value)}
-              placeholder="e.g., My Tech Portfolio"
-              className="bg-background border-border text-foreground"
+              value={basketName}
+              onChange={(e) => setBasketName(e.target.value)}
+              placeholder="Enter basket name (e.g., Tech Growth, Value Picks)"
+              className="w-full"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && basketName.trim()) {
+                  handleSave()
+                }
+              }}
+              autoFocus
             />
           </div>
         </div>
-        <AlertDialogFooter>
-          <AlertDialogCancel className="bg-background text-foreground border-border hover:bg-accent">
-            {cancelText}
-          </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleConfirm}
-            disabled={!newBasketName.trim()}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted"
+
+        <DialogFooter className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={handleCancel}
+            disabled={isLoading}
           >
-            {confirmText}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={!basketName.trim() || isLoading}
+            className="gap-2"
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Plus className="h-4 w-4" />
+            )}
+            Create Basket
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
-
-export default AddBasketModal
