@@ -29,12 +29,14 @@ export default function GoogleTrendSignalsPage() {
   const [comparisonData, setComparisonData] = useState([])
   const [error, setError] = useState<string | null>(null)
   const [summaryStats, setSummaryStats] = useState({
-    // Corrected: useState
     total: 0,
     positive: 0,
     negative: 0,
     neutral: 0,
     lastUpdate: "",
+    wins: 0, // New
+    losses: 0, // New
+    winRate: 0, // New
   })
 
   const [currentPrices, setCurrentPrices] = useState<Record<string, number>>({})
@@ -112,6 +114,9 @@ export default function GoogleTrendSignalsPage() {
           negative: data.filter((item: GTrendSignal) => item.sentiment?.toLowerCase() === "negative").length,
           neutral: data.filter((item: GTrendSignal) => item.sentiment?.toLowerCase() === "neutral").length,
           lastUpdate: data.length > 0 ? formatDate(data[0].date) : "N/A",
+          wins: 0, // Will be calculated in a separate useEffect
+          losses: 0, // Will be calculated in a separate useEffect
+          winRate: 0, // Will be calculated in a separate useEffect
         }
         setSummaryStats(stats)
 
@@ -133,6 +138,46 @@ export default function GoogleTrendSignalsPage() {
       fetchCurrentPrices(uniqueSymbols)
     }
   }, [data])
+
+  // New useEffect to calculate Win Rate
+  useEffect(() => {
+    if (filteredData.length > 0 && !pricesLoading) {
+      let wins = 0
+      let losses = 0
+
+      filteredData.forEach((signal) => {
+        const currentPrice = currentPrices[signal.comp_symbol] || 0
+        const entryPrice = signal.entry_price
+
+        if (entryPrice === 0) return // Cannot calculate P/L if entry price is 0
+
+        if (signal.sentiment?.toLowerCase() === "positive") {
+          if (currentPrice >= entryPrice) {
+            wins++
+          } else {
+            losses++
+          }
+        } else if (signal.sentiment?.toLowerCase() === "negative") {
+          if (currentPrice <= entryPrice) {
+            wins++
+          } else {
+            losses++
+          }
+        }
+        // Neutral signals are ignored for win/loss calculation
+      })
+
+      const totalTrades = wins + losses
+      const calculatedWinRate = totalTrades > 0 ? (wins / totalTrades) * 100 : 0
+
+      setSummaryStats((prevStats) => ({
+        ...prevStats,
+        wins,
+        losses,
+        winRate: calculatedWinRate,
+      }))
+    }
+  }, [filteredData, currentPrices, pricesLoading])
 
   useEffect(() => {
     // Apply filters and sorting
@@ -219,6 +264,11 @@ export default function GoogleTrendSignalsPage() {
                       ? "∞"
                       : "0"}
                 </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-muted-foreground text-sm">Win Rate %</span> {/* New Display */}
+                <span className="text-foreground text-2xl font-bold">{summaryStats.winRate.toFixed(2)}%</span>{" "}
+                {/* New Display */}
               </div>
               <div className="flex flex-col">
                 <span className="text-muted-foreground text-sm">Positive Signals</span>
