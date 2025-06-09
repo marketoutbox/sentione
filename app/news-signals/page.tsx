@@ -26,13 +26,13 @@ export default function NewsSignalsPage() {
   const [sentimentFilter, setSentimentFilter] = useState("all")
   const [sortBy, setSortBy] = useState("date")
   const [sortOrder, setSortOrder] = useState("desc")
-  const [summaryStats, setSummaryStats] = useState({
+  const [summaryStats, setSummaryStats] = {
     total: 0,
     positive: 0,
     negative: 0,
     neutral: 0,
     lastUpdate: "",
-  })
+  }
   const [comparisonData, setComparisonData] = useState([])
 
   const [currentPrices, setCurrentPrices] = useState<Record<string, number>>({})
@@ -280,39 +280,65 @@ export default function NewsSignalsPage() {
                       <th className="px-6 py-4 text-center font-medium">Sentiment</th>
                       <th className="px-6 py-4 font-medium text-right">Entry Price</th>
                       <th className="px-6 py-4 font-medium text-right">Current Price</th>
+                      <th className="px-6 py-4 font-medium text-right">P/L%</th> {/* Updated Header */}
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredData.map((row, i) => (
-                      <tr key={i} className="border-b border-border hover:bg-muted/50 transition-colors">
-                        <td className="px-6 py-4 text-foreground">{row.date}</td>
-                        <td className="px-6 py-4 font-medium text-foreground">{row.comp_symbol}</td>
-                        <td className="px-6 py-4 text-foreground max-w-xs truncate">{row.analyzed_articles}</td>
-                        <td className="px-6 py-4 text-right text-foreground">{row.sentiment_score}</td>
-                        <td className="px-6 py-4 text-center">
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium inline-block
-                              ${
-                                row.sentiment.toLowerCase() === "positive"
-                                  ? "bg-green-100 text-green-800 border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800"
-                                  : row.sentiment.toLowerCase() === "negative"
-                                    ? "bg-red-100 text-red-800 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800"
-                                    : "bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800"
-                              }`}
-                          >
-                            {row.sentiment}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-right text-foreground">${row.entry_price}</td>
-                        <td className="px-6 py-4 text-right text-foreground">
-                          {pricesLoading ? (
-                            <Loader2 className="h-4 w-4 animate-spin inline" />
-                          ) : (
-                            `$${(currentPrices[row.comp_symbol] || 0).toFixed(2)}`
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                    {filteredData.map((row, i) => {
+                      const currentPrice = currentPrices[row.comp_symbol] || 0
+                      const entryPrice = row.entry_price
+                      let pLPercentage: number | null = null
+                      let changeColorClass = ""
+
+                      if (row.sentiment.toLowerCase() === "positive") {
+                        if (entryPrice !== 0) {
+                          pLPercentage = ((currentPrice - entryPrice) / entryPrice) * 100
+                        }
+                      } else if (row.sentiment.toLowerCase() === "negative") {
+                        if (entryPrice !== 0) {
+                          pLPercentage = ((entryPrice - currentPrice) / entryPrice) * 100 // Inverted for profit
+                        }
+                      }
+
+                      if (pLPercentage !== null) {
+                        changeColorClass = pLPercentage > 0 ? "text-green-600" : pLPercentage < 0 ? "text-red-600" : ""
+                      }
+
+                      return (
+                        <tr key={i} className="border-b border-border hover:bg-muted/50 transition-colors">
+                          <td className="px-6 py-4 text-foreground">{row.date}</td>
+                          <td className="px-6 py-4 font-medium text-foreground">{row.comp_symbol}</td>
+                          <td className="px-6 py-4 text-foreground max-w-xs truncate">{row.analyzed_articles}</td>
+                          <td className="px-6 py-4 text-right text-foreground">{row.sentiment_score}</td>
+                          <td className="px-6 py-4 text-center">
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-medium inline-block
+                                ${
+                                  row.sentiment.toLowerCase() === "positive"
+                                    ? "bg-green-100 text-green-800 border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800"
+                                    : row.sentiment.toLowerCase() === "negative"
+                                      ? "bg-red-100 text-red-800 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800"
+                                      : "bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800"
+                                }`}
+                            >
+                              {row.sentiment}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-right text-foreground">${row.entry_price}</td>
+                          <td className="px-6 py-4 text-right text-foreground">
+                            {pricesLoading ? (
+                              <Loader2 className="h-4 w-4 animate-spin inline" />
+                            ) : (
+                              `$${(currentPrices[row.comp_symbol] || 0).toFixed(2)}`
+                            )}
+                          </td>
+                          <td className={`px-6 py-4 text-right font-medium ${changeColorClass}`}>
+                            {pLPercentage !== null ? `${pLPercentage.toFixed(2)}%` : "N/A"}
+                          </td>{" "}
+                          {/* Updated Column */}
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>
