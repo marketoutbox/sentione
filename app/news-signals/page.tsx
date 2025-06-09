@@ -26,13 +26,14 @@ export default function NewsSignalsPage() {
   const [sentimentFilter, setSentimentFilter] = useState("all")
   const [sortBy, setSortBy] = useState("date")
   const [sortOrder, setSortOrder] = useState("desc")
-  const [summaryStats, setSummaryStats] = {
+  const [summaryStats, setSummaryStats] = useState({
+    // CORRECTED: Changed from = { ... } to = useState({ ... })
     total: 0,
     positive: 0,
     negative: 0,
     neutral: 0,
     lastUpdate: "",
-  }
+  })
   const [comparisonData, setComparisonData] = useState([])
 
   const [currentPrices, setCurrentPrices] = useState<Record<string, number>>({})
