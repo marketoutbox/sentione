@@ -32,14 +32,15 @@ export default function TwitterSignalsPage() {
   const [sentimentFilter, setSentimentFilter] = useState("all")
   const [sortBy, setSortBy] = useState("date")
   const [sortOrder, setSortOrder] = useState("desc")
-  const [summaryStats, setSummaryStats] = {
+  const [summaryStats, setSummaryStats] = useState({
+    // Corrected: useState
     total: 0,
     positive: 0,
     negative: 0,
     neutral: 0,
     lastUpdate: "",
     totalTweets: 0,
-  }
+  })
 
   const [currentPrices, setCurrentPrices] = useState<Record<string, number>>({})
   const [pricesLoading, setPricesLoading] = useState(false)
