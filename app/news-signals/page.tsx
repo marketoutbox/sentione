@@ -169,12 +169,13 @@ export default function NewsSignalsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+        {" "}
+        {/* Updated classes */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">News Signals</h1>
           <p className="text-muted-foreground mt-2">View the latest News sentiment signals for each stock.</p>
         </div>
-
         {/* Summary Stats Card */}
         <Card className="mb-8">
           <CardContent className="p-6">
@@ -207,7 +208,6 @@ export default function NewsSignalsPage() {
             </div>
           </CardContent>
         </Card>
-
         {/* Filters and Controls */}
         <Card className="mb-8">
           <CardContent className="p-6">
@@ -256,7 +256,6 @@ export default function NewsSignalsPage() {
             </div>
           </CardContent>
         </Card>
-
         {/* Table View */}
         <Card className="mb-8">
           <CardContent className="p-0">
@@ -324,7 +323,6 @@ export default function NewsSignalsPage() {
             )}
           </CardContent>
         </Card>
-
         {/* Signal Source Comparison */}
         <Card>
           <CardHeader>
