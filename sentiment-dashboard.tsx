@@ -1182,10 +1182,19 @@ const SentimentDashboard = () => {
                             Delete
                           </Button>
 
-                          <Button onClick={() => setIsAddBasketModalOpen(true)} disabled={isLoading} className="gap-1">
-                            <Plus className="h-4 w-4" />
-                            Add to New Basket
-                          </Button>
+                          <AddBasketModal
+                            open={isAddBasketModalOpen}
+                            onOpenChange={setIsAddBasketModalOpen}
+                            onCreateBasket={createNewBasket}
+                            title="Create New Basket"
+                            description="Enter a name for your new stock basket."
+                            confirmText="Create Basket"
+                          >
+                            <Button disabled={isLoading} className="gap-1">
+                              <Plus className="h-4 w-4" />
+                              Add to New Basket
+                            </Button>
+                          </AddBasketModal>
 
                           {basketId && (
                             <Button
@@ -1402,23 +1411,17 @@ const SentimentDashboard = () => {
             )}
 
             <StockSelector
-              isOpen={isStockSelectorOpen}
-              onClose={() => setIsStockSelectorOpen(false)}
+              open={isStockSelectorOpen}
+              onOpenChange={setIsStockSelectorOpen}
               selectedStocks={stocks}
               onSaveStocks={handleSaveStocks}
             />
 
             <StockAllocation
-              isOpen={isAllocationEditorOpen}
-              onClose={() => setIsAllocationEditorOpen(false)}
+              open={isAllocationEditorOpen}
+              onOpenChange={setIsAllocationEditorOpen}
               stocks={stocks}
-              onSaveStocks={handleSaveStocks}
-            />
-
-            <AddBasketModal
-              isOpen={isAddBasketModalOpen}
-              onClose={() => setIsAddBasketModalOpen(false)}
-              onCreateBasket={createNewBasket}
+              onSave={handleSaveStocks}
             />
           </>
         )}
